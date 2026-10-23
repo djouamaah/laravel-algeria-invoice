@@ -1,0 +1,52 @@
+{
+    "name": "djouamaah/laravel-algeria-invoice",
+    "description": "Algerian invoices for Laravel: VAT, cash stamp duty (Finance Law 2025), mandatory mentions (decree 05-468), gap-free numbering, amounts in Arabic and French words, printable HTML and optional PDF.",
+    "keywords": ["laravel", "algeria", "algerie", "الجزائر", "invoice", "facture", "فاتورة", "tva", "droit de timbre", "dzd"],
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Djouamaa",
+            "email": "djouamaah@gmail.com"
+        }
+    ],
+    "require": {
+        "php": "^8.1",
+        "illuminate/database": "^10.0|^11.0|^12.0|^13.0",
+        "illuminate/support": "^10.0|^11.0|^12.0|^13.0",
+        "illuminate/view": "^10.0|^11.0|^12.0|^13.0"
+    },
+    "require-dev": {
+        "mpdf/mpdf": "^8.2",
+        "orchestra/testbench": "^8.0|^9.0|^10.0|^11.0",
+        "phpunit/phpunit": "^10.5|^11.0|^12.0|^13.0"
+    },
+    "suggest": {
+        "mpdf/mpdf": "Required for PDF output (handles Arabic shaping and right-to-left text)."
+    },
+    "autoload": {
+        "psr-4": {
+            "Djouamaah\\AlgeriaInvoice\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Djouamaah\\AlgeriaInvoice\\Tests\\": "tests/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Djouamaah\\AlgeriaInvoice\\AlgeriaInvoiceServiceProvider"
+            ],
+            "aliases": {
+                "AlgeriaInvoice": "Djouamaah\\AlgeriaInvoice\\Facades\\AlgeriaInvoice"
+            }
+        }
+    },
+    "scripts": {
+        "test": "phpunit"
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}
