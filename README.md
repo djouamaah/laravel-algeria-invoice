@@ -10,7 +10,7 @@
 - **البيانات الإلزامية:** فحص الفاتورة وفق المرسوم التنفيذي 05-468، مع رسائل بالعربية والفرنسية والإنجليزية.
 - **الترقيم:** متسلسل بلا فجوات، يُعاد كل سنة (`FA-2026-00001`)، ولا يتأثر بطلبين في نفس اللحظة.
 - **المبلغ بالحروف:** بالعربية والفرنسية («ألف ومئتان وخمسون دينارًا جزائريًا وخمسون سنتيمًا»).
-- **الطباعة:** قالب HTML بالعربية أو الفرنسية، وملف PDF عبر mPDF عند تثبيته.
+- **الطباعة:** ثلاثة قوالب جاهزة (`classic` و`modern` و`minimal`) أو قالبك الخاص، بالعربية أو الفرنسية، وملف PDF عبر mPDF عند تثبيته.
 - **أنواع الوثائق:** فاتورة، وإشعار دائن (Avoir)، وفاتورة شكلية (Proforma).
 
 الحزمة لا تحفظ الفواتير في قاعدة البيانات، فتطبيقك يحفظها في نماذجه الخاصة (`toArray()` و`fromArray()`). الجدول الوحيد الذي تنشئه هو جدول الترقيم.
@@ -149,7 +149,43 @@ $pdf = AlgeriaInvoice::pdf($invoice, 'fr');        // محتوى ملف PDF
 return AlgeriaInvoice::download($invoice, 'ar');   // تنزيل FA-2026-00001.pdf
 ```
 
-لتخصيص القالب: `php artisan vendor:publish --tag=algeria-invoice-views`.
+### القوالب
+
+| القالب | الشكل |
+|---|---|
+| `classic` (الافتراضي) | البائع في الأعلى، إطار للزبون، ورأس جدول أخضر |
+| `modern` | شريط ملوّن في الأعلى، البائع والزبون جنبًا إلى جنب، والصافي للدفع بارز |
+| `minimal` | أبيض وأسود بجدول مُسطَّر، مناسب لأي طابعة، مع خانة «الختم والإمضاء» |
+
+```php
+AlgeriaInvoice::pdf($invoice, 'ar', template: 'modern');
+AlgeriaInvoice::html($invoice, 'fr', template: 'minimal');
+AlgeriaInvoice::download($invoice, 'ar', template: 'minimal');
+AlgeriaInvoice::templates();   // ['classic' => ..., 'modern' => ..., 'minimal' => ..., + قوالبك]
+```
+
+القالب الافتراضي في `config/algeria-invoice.php`: `'template' => 'classic'`.
+
+**قالبك الخاص:** أنشئ ملف Blade، ثم سجّله باسم في ملف الإعدادات:
+
+```php
+// config/algeria-invoice.php
+'templates' => [
+    'shop' => 'invoices.shop',   // resources/views/invoices/shop.blade.php
+],
+```
+
+في القالب يوجد المتغيّر `$v`، وفيه كل شيء جاهز ومترجَم:
+- `$v->title()` و`$v->references()` و`$v->sentence()`.
+- `$v->money($centimes)` و`$v->vatRows()` و`$v->partyLines($party)` و`$v->partyIds($party)`.
+- `$v->invoice` و`$v->totals`، و`$v->t('labels.net_to_pay')` للترجمة.
+
+ويمكنك أيضًا استعمال أجزاء القوالب الجاهزة:
+- `algeria-invoice::partials.lines`
+- `algeria-invoice::partials.totals`
+- `algeria-invoice::partials.party`
+
+لتعديل القوالب الجاهزة نفسها: `php artisan vendor:publish --tag=algeria-invoice-views`.
 
 ### الحفظ في تطبيقك
 
@@ -205,7 +241,7 @@ Algerian invoices for Laravel. All amounts are integers in **centimes**.
 - **Mandatory mentions** check (executive decree 05-468) with messages in Arabic, French and English.
 - **Gap-free numbering** per series and year (`FA-2026-00001`), safe under concurrency.
 - **Amounts in words** in Arabic and French.
-- Printable **HTML** in Arabic (RTL), French or English, and **PDF** through `mpdf/mpdf` when installed.
+- Printable **HTML** in Arabic (RTL), French or English, and **PDF** through `mpdf/mpdf` when installed, with three **templates** (`classic`, `modern`, `minimal`) or your own.
 - Invoices, credit notes (avoirs) and proforma invoices. Nothing is stored: keep `toArray()` in your own models.
 
 > ⚠️ This is a helper, not tax advice. Some stamp duty details are unclear in the available sources; every rule is configurable. Check them with your accountant.
@@ -235,6 +271,16 @@ DB::transaction(function () use ($invoice) {      // the number is only consumed
 
 AlgeriaInvoice::words(125050, 'ar');              // ألف ومئتان وخمسون دينارًا جزائريًا وخمسون سنتيمًا
 return AlgeriaInvoice::download($invoice, 'ar');  // PDF
+```
+
+Templates: `classic` (default), `modern` (coloured header, side-by-side parties) and `minimal` (black and white grid with a signature box).
+
+```php
+AlgeriaInvoice::pdf($invoice, 'ar', template: 'modern');
+
+// config/algeria-invoice.php: your own Blade view, which receives $v (an InvoiceView with everything translated and formatted)
+'template' => 'classic',
+'templates' => ['shop' => 'invoices.shop'],
 ```
 
 Stamp duty settings (`mode`, `exempt_up_to`, `minimum`, `maximum`, `base`, `brackets`) live in `config/algeria-invoice.php`; see the table above for the open questions.

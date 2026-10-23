@@ -64,18 +64,31 @@ class AlgeriaInvoice
         return AmountInWords::words($centimes, $locale);
     }
 
-    public function html(Invoice $invoice, string $locale = 'fr'): string
+    /**
+     * Template names (built-in 'classic', 'modern', 'minimal' plus config('algeria-invoice.templates')) => view.
+     *
+     * @return array<string, string>
+     */
+    public function templates(): array
     {
-        return $this->renderer->html($invoice, $locale);
+        return $this->renderer->templates();
     }
 
-    public function pdf(Invoice $invoice, string $locale = 'fr'): string
+    /**
+     * $template: a template name, a view name, or null for config('algeria-invoice.template').
+     */
+    public function html(Invoice $invoice, string $locale = 'fr', ?string $template = null): string
     {
-        return $this->renderer->pdf($invoice, $locale);
+        return $this->renderer->html($invoice, $locale, $template);
     }
 
-    public function download(Invoice $invoice, string $locale = 'fr', ?string $filename = null): Response
+    public function pdf(Invoice $invoice, string $locale = 'fr', ?string $template = null): string
     {
-        return $this->renderer->download($invoice, $locale, $filename);
+        return $this->renderer->pdf($invoice, $locale, $template);
+    }
+
+    public function download(Invoice $invoice, string $locale = 'fr', ?string $filename = null, ?string $template = null): Response
+    {
+        return $this->renderer->download($invoice, $locale, $filename, $template);
     }
 }

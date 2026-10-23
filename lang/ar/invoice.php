@@ -40,6 +40,7 @@ return [
         'net_to_pay' => 'الصافي للدفع',
         'payment_method' => 'طريقة الدفع',
         'notes' => 'ملاحظات',
+        'signature' => 'الختم والإمضاء',
     ],
     'payment' => [
         'cash' => 'نقدًا',

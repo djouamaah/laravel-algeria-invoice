@@ -10,9 +10,10 @@ use Illuminate\Support\Facades\Facade;
  * @method static \Djouamaah\AlgeriaInvoice\Numbering\Sequence sequence()
  * @method static int stampDuty(int $centimes)
  * @method static string words(int $centimes, string $locale = 'fr')
- * @method static string html(\Djouamaah\AlgeriaInvoice\Invoice $invoice, string $locale = 'fr')
- * @method static string pdf(\Djouamaah\AlgeriaInvoice\Invoice $invoice, string $locale = 'fr')
- * @method static \Illuminate\Http\Response download(\Djouamaah\AlgeriaInvoice\Invoice $invoice, string $locale = 'fr', ?string $filename = null)
+ * @method static array templates()
+ * @method static string html(\Djouamaah\AlgeriaInvoice\Invoice $invoice, string $locale = 'fr', ?string $template = null)
+ * @method static string pdf(\Djouamaah\AlgeriaInvoice\Invoice $invoice, string $locale = 'fr', ?string $template = null)
+ * @method static \Illuminate\Http\Response download(\Djouamaah\AlgeriaInvoice\Invoice $invoice, string $locale = 'fr', ?string $filename = null, ?string $template = null)
  *
  * @see \Djouamaah\AlgeriaInvoice\AlgeriaInvoice
  */

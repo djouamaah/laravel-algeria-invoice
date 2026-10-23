@@ -40,6 +40,7 @@ return [
         'net_to_pay' => 'Net to pay',
         'payment_method' => 'Payment method',
         'notes' => 'Notes',
+        'signature' => 'Stamp and signature',
     ],
     'payment' => [
         'cash' => 'Cash',

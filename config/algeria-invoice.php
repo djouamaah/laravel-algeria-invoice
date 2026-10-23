@@ -97,6 +97,23 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Templates
+    |--------------------------------------------------------------------------
+    |
+    | Built-in: 'classic', 'modern', 'minimal'. Add your own as name => view,
+    | for example 'shop' => 'invoices.shop' (resources/views/invoices/shop.blade.php).
+    | Choose per call: AlgeriaInvoice::pdf($invoice, 'ar', template: 'modern').
+    |
+    */
+
+    'template' => 'classic',
+
+    'templates' => [
+        // 'shop' => 'invoices.shop',
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
     | PDF (requires mpdf/mpdf)
     |--------------------------------------------------------------------------
     */

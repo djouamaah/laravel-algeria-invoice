@@ -40,6 +40,7 @@ return [
         'net_to_pay' => 'Net à payer',
         'payment_method' => 'Mode de paiement',
         'notes' => 'Observations',
+        'signature' => 'Cachet et signature',
     ],
     'payment' => [
         'cash' => 'Espèces',

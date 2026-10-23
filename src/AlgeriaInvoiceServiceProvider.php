@@ -13,7 +13,7 @@ class AlgeriaInvoiceServiceProvider extends ServiceProvider
         $this->mergeConfigFrom(__DIR__.'/../config/algeria-invoice.php', 'algeria-invoice');
 
         $this->app->bind(Sequence::class, fn ($app) => new Sequence($app['db']->connection(), (array) $app['config']->get('algeria-invoice.numbering', [])));
-        $this->app->bind(Renderer::class, fn ($app) => new Renderer($app['view'], (array) $app['config']->get('algeria-invoice.pdf', [])));
+        $this->app->bind(Renderer::class, fn ($app) => new Renderer($app['view'], (array) $app['config']->get('algeria-invoice', [])));
         $this->app->singleton(AlgeriaInvoice::class, fn ($app) => new AlgeriaInvoice(
             (array) $app['config']->get('algeria-invoice', []),
             $app->make(Sequence::class),
