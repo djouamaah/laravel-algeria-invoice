@@ -14,6 +14,8 @@ return [
         'buyer' => 'Client',
         'original' => 'Facture d\'origine',
         'order' => 'Bon de commande',
+        'delivery_note' => 'Bon de livraison',
+        'dated' => 'du',
         'legal_form' => 'Forme juridique',
         'capital' => 'Capital social',
         'address' => 'Adresse',

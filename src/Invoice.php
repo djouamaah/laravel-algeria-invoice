@@ -34,7 +34,11 @@ class Invoice
     /** Number of the invoice a credit note cancels or corrects. */
     protected ?string $originalNumber = null;
 
-    protected ?string $orderReference = null;
+    /** Purchase order (bon de commande). */
+    protected ?Reference $order = null;
+
+    /** @var Reference[] Delivery notes (bons de livraison), several for a summary invoice. */
+    protected array $deliveryNotes = [];
 
     protected ?string $notes = null;
 
@@ -133,9 +137,48 @@ class Invoice
         return $this;
     }
 
+    /**
+     * The purchase order (bon de commande): ->order('BC-2026-118', '2026-10-20'). Null removes it.
+     */
+    public function order(Reference|array|string|null $number, DateTimeInterface|string|null $date = null): static
+    {
+        $this->order = $number === null || $number === '' ? null : Reference::make($number, $date);
+
+        return $this;
+    }
+
+    /**
+     * Same as order() without a date; kept for compatibility with 1.0.
+     */
     public function orderReference(?string $reference): static
     {
-        $this->orderReference = $reference;
+        return $this->order($reference);
+    }
+
+    /**
+     * Add a delivery note (bon de livraison): ->deliveryNote('BL-2026-0451', '2026-10-21').
+     * Call it once per delivery note for an invoice that groups several deliveries.
+     */
+    public function deliveryNote(Reference|array|string $number, DateTimeInterface|string|null $date = null): static
+    {
+        $note = Reference::make($number, $date);
+        $this->deliveryNotes = array_values(array_filter($this->deliveryNotes, fn (Reference $r) => $r->number !== $note->number));
+        $this->deliveryNotes[] = $note;
+
+        return $this;
+    }
+
+    /**
+     * Replace all delivery notes: ->deliveryNotes(['BL-1', ['number' => 'BL-2', 'date' => '2026-10-21']]).
+     *
+     * @param  array<int, Reference|array|string>  $notes
+     */
+    public function deliveryNotes(array $notes): static
+    {
+        $this->deliveryNotes = [];
+        foreach ($notes as $note) {
+            $this->deliveryNote($note);
+        }
 
         return $this;
     }
@@ -200,9 +243,21 @@ class Invoice
         return $this->originalNumber;
     }
 
+    public function getOrder(): ?Reference
+    {
+        return $this->order;
+    }
+
+    /** The purchase order number. */
     public function getOrderReference(): ?string
     {
-        return $this->orderReference;
+        return $this->order?->number;
+    }
+
+    /** @return Reference[] */
+    public function getDeliveryNotes(): array
+    {
+        return $this->deliveryNotes;
     }
 
     public function getNotes(): ?string
@@ -268,7 +323,9 @@ class Invoice
             'lines' => array_map(fn (Line $l) => $l->toArray(), $this->lines),
             'payment_method' => $this->paymentMethod?->value,
             'original_number' => $this->originalNumber,
-            'order_reference' => $this->orderReference,
+            'order_reference' => $this->order?->number,
+            'order_date' => $this->order?->date?->format('Y-m-d'),
+            'delivery_notes' => array_map(fn (Reference $r) => $r->toArray(), $this->deliveryNotes),
             'notes' => $this->notes,
             'totals' => $this->totals()->toArray(),
         ];
@@ -297,7 +354,8 @@ class Invoice
             ->lines($data['lines'] ?? [])
             ->payment($data['payment_method'] ?? null)
             ->original($data['original_number'] ?? null)
-            ->orderReference($data['order_reference'] ?? null)
+            ->order($data['order_reference'] ?? null, $data['order_date'] ?? null)
+            ->deliveryNotes($data['delivery_notes'] ?? [])
             ->notes($data['notes'] ?? null);
     }
 }

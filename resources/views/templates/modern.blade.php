@@ -43,7 +43,7 @@
             </td>
             <td style="width: 45%" class="refs">
                 @foreach ($v->references() as $ref)
-                    {{ $ref['label'] }} : <b dir="ltr">{{ $ref['value'] }}</b><br>
+                    {{ $ref['label'] }} : <b @if ($ref['ltr']) dir="ltr" @endif>{{ $ref['value'] }}</b><br>
                 @endforeach
             </td>
         </tr>

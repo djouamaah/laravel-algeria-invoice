@@ -14,6 +14,8 @@ return [
         'buyer' => 'Customer',
         'original' => 'Original invoice',
         'order' => 'Purchase order',
+        'delivery_note' => 'Delivery note',
+        'dated' => 'dated',
         'legal_form' => 'Legal form',
         'capital' => 'Share capital',
         'address' => 'Address',

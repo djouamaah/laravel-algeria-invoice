@@ -36,7 +36,7 @@
                 <div class="title">{{ $v->title() }}</div>
                 <div class="meta">
                     @foreach ($v->references() as $ref)
-                        <b>{{ $ref['label'] }}</b> : <span dir="ltr">{{ $ref['value'] }}</span><br>
+                        <b>{{ $ref['label'] }}</b> : <span @if ($ref['ltr']) dir="ltr" @endif>{{ $ref['value'] }}</span><br>
                     @endforeach
                 </div>
             </td>

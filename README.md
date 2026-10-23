@@ -12,6 +12,7 @@
 - **المبلغ بالحروف:** بالعربية والفرنسية («ألف ومئتان وخمسون دينارًا جزائريًا وخمسون سنتيمًا»).
 - **الطباعة:** ثلاثة قوالب جاهزة (`classic` و`modern` و`minimal`) أو قالبك الخاص، بالعربية أو الفرنسية، وملف PDF عبر mPDF عند تثبيته.
 - **أنواع الوثائق:** فاتورة، وإشعار دائن (Avoir)، وفاتورة شكلية (Proforma).
+- **المراجع:** إسناد الفاتورة إلى سند الطلب وإلى وصل تسليم أو أكثر، مع أرقامها وتواريخها.
 
 الحزمة لا تحفظ الفواتير في قاعدة البيانات، فتطبيقك يحفظها في نماذجه الخاصة (`toArray()` و`fromArray()`). الجدول الوحيد الذي تنشئه هو جدول الترقيم.
 
@@ -126,6 +127,29 @@ AlgeriaInvoice::sequence()->current();       // آخر رقم مستعمل
 ```
 
 صيغة الرقم قابلة للتعديل: `'format' => '{series}-{year}-{number}'`، و`'pad' => 5`.
+
+### سند الطلب ووصولات التسليم
+
+```php
+$invoice
+    ->order('BC-2026-118', '2026-10-20')              // سند الطلب: الرقم والتاريخ
+    ->deliveryNote('BL-2026-0451', '2026-10-21')      // وصل تسليم
+    ->deliveryNote('BL-2026-0458', '2026-10-22');     // فاتورة تجميعية لعدة وصولات
+
+$invoice->getOrder()->number;      // "BC-2026-118"
+$invoice->getDeliveryNotes();      // [Reference, Reference]
+$invoice->deliveryNotes(['BL-1', ['number' => 'BL-2', 'date' => '2026-10-21']]);   // استبدال القائمة
+```
+
+- **في الفاتورة:** تظهر المراجع بجانب رقمها، كل وصل في سطر مستقل («وصل التسليم : BL-2026-0451 بتاريخ 21/10/2026»).
+- **الحفظ:** تُحفظ في `toArray()` تحت المفاتيح `order_reference` و`order_date` و`delivery_notes`.
+- **التوافق مع 1.0:** `orderReference('BC-118')` ما زالت تعمل.
+
+لترقيم وصولات التسليم بسلسلة خاصة بها:
+
+```php
+AlgeriaInvoice::nextNumber(series: 'BL');   // BL-2026-00001
+```
 
 ### الإشعار الدائن والفاتورة الشكلية
 
@@ -243,6 +267,7 @@ Algerian invoices for Laravel. All amounts are integers in **centimes**.
 - **Amounts in words** in Arabic and French.
 - Printable **HTML** in Arabic (RTL), French or English, and **PDF** through `mpdf/mpdf` when installed, with three **templates** (`classic`, `modern`, `minimal`) or your own.
 - Invoices, credit notes (avoirs) and proforma invoices. Nothing is stored: keep `toArray()` in your own models.
+- Link an invoice to its **purchase order** and one or more **delivery notes**, with numbers and dates.
 
 > ⚠️ This is a helper, not tax advice. Some stamp duty details are unclear in the available sources; every rule is configurable. Check them with your accountant.
 
@@ -259,7 +284,10 @@ $invoice = AlgeriaInvoice::make()                 // seller from config('algeria
     ->buyer(['name' => 'EURL Client', 'address' => 'Sétif', 'rc' => '19/00-7654321B20', 'nif' => '000219987654321'])
     ->addLine('Laptop', 2, 85000, 19)             // description, quantity, unit price excl. VAT (DA), VAT rate
     ->addLine('Books', 30, 1200, 9, 'pcs', 5)     // unit, 5% discount
-    ->payment('cash');
+    ->payment('cash')
+    ->order('BC-2026-118', '2026-10-20')          // purchase order (bon de commande)
+    ->deliveryNote('BL-2026-0451', '2026-10-21')  // delivery notes (bons de livraison), as many as needed
+    ->deliveryNote('BL-2026-0458', '2026-10-22');
 
 $invoice->totals()->netToPay;                     // centimes, stamp duty included
 $invoice->errors();                               // missing mandatory mentions, [] when compliant

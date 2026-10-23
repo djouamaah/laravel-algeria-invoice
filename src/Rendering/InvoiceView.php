@@ -6,6 +6,7 @@ use Djouamaah\AlgeriaInvoice\Invoice;
 use Djouamaah\AlgeriaInvoice\Line;
 use Djouamaah\AlgeriaInvoice\Money;
 use Djouamaah\AlgeriaInvoice\Party;
+use Djouamaah\AlgeriaInvoice\Reference;
 use Djouamaah\AlgeriaInvoice\Totals;
 use Djouamaah\AlgeriaInvoice\Words\AmountInWords;
 
@@ -98,7 +99,8 @@ class InvoiceView
     }
 
     /**
-     * Document references shown next to the title: number, date, due date, original invoice, order.
+     * Document references shown next to the title: number, date, due date, original invoice, purchase order,
+     * delivery notes. 'ltr' is false when the value mixes in translated words ("du", "بتاريخ").
      *
      * @return array<int, array{label: string, value: string, ltr: bool}>
      */
@@ -106,13 +108,26 @@ class InvoiceView
     {
         $i = $this->invoice;
 
-        return array_values(array_filter([
+        $references = array_filter([
             $i->getNumber() ? ['label' => $this->t('labels.number'), 'value' => $i->getNumber(), 'ltr' => true] : null,
             ['label' => $this->t('labels.date'), 'value' => $this->date($i->getDate()), 'ltr' => true],
             $i->getDueDate() ? ['label' => $this->t('labels.due_date'), 'value' => $this->date($i->getDueDate()), 'ltr' => true] : null,
             $i->getOriginalNumber() ? ['label' => $this->t('labels.original'), 'value' => $i->getOriginalNumber(), 'ltr' => true] : null,
-            $i->getOrderReference() ? ['label' => $this->t('labels.order'), 'value' => $i->getOrderReference(), 'ltr' => true] : null,
-        ]));
+            $i->getOrder() ? ['label' => $this->t('labels.order'), 'value' => $this->reference($i->getOrder()), 'ltr' => $i->getOrder()->date === null] : null,
+        ]);
+
+        // one line per delivery note: mixing several Latin numbers and Arabic words on one line breaks the reading order
+        foreach ($i->getDeliveryNotes() as $note) {
+            $references[] = ['label' => $this->t('labels.delivery_note'), 'value' => $this->reference($note), 'ltr' => $note->date === null];
+        }
+
+        return array_values($references);
+    }
+
+    /** "BL-2026-0451 du 21/10/2026" / "BL-2026-0451 بتاريخ 21/10/2026" */
+    public function reference(Reference $reference): string
+    {
+        return $reference->number.($reference->date ? ' '.$this->t('labels.dated').' '.$this->date($reference->date) : '');
     }
 
     /**
