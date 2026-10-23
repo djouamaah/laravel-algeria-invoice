@@ -5,6 +5,8 @@
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-10-23
+
 ### أُضيف
 - إسناد الفاتورة إلى سند الطلب (`order($number, $date)`) وإلى وصل تسليم أو أكثر (`deliveryNote($number, $date)` و`deliveryNotes([...])`)، وعرضها في القوالب الثلاثة مع تواريخها، وحفظها في `toArray()` و`fromArray()`.
 - كلاس `Reference` (الرقم والتاريخ).
@@ -26,5 +28,6 @@
 - الفاتورة، والإشعار الدائن (Avoir)، والفاتورة الشكلية (Proforma).
 - ثلاثة قوالب للفاتورة (`classic` و`modern` و`minimal`)، وإمكانية تسجيل قوالب خاصة في الإعدادات، واختيار القالب عند كل استدعاء (`template:`).
 
-[Unreleased]: https://github.com/djouamaah/laravel-algeria-invoice/compare/v1.0.0...HEAD
+[Unreleased]: https://github.com/djouamaah/laravel-algeria-invoice/compare/v1.1.0...HEAD
+[1.1.0]: https://github.com/djouamaah/laravel-algeria-invoice/compare/v1.0.0...v1.1.0
 [1.0.0]: https://github.com/djouamaah/laravel-algeria-invoice/releases/tag/v1.0.0
